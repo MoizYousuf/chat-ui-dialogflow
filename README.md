@@ -4,6 +4,34 @@ A real-time chat application that connects a React frontend to **Google Dialogfl
 
 ## Architecture
 
+### Component overview
+
+```mermaid
+flowchart LR
+    subgraph Browser
+        UI[Chat UI<br/>React + Next.js]
+        Store[(Zustand store<br/>localStorage)]
+        UI <--> Store
+    end
+
+    subgraph Server["Node.js server (server.ts)"]
+        HTTP[Next.js HTTP]
+        SIO[Socket.io server<br/>socket.ts]
+        DFClient[Dialogflow client<br/>dialogflow.ts]
+        HTTP --- SIO
+        SIO --> DFClient
+    end
+
+    subgraph Google["Google Cloud"]
+        DF[Dialogflow ES<br/>detectIntent API]
+    end
+
+    UI <-->|WebSocket<br/>message:send / message:receive| SIO
+    DFClient <-->|REST / gRPC| DF
+```
+
+### Message flow
+
 ```mermaid
 sequenceDiagram
     participant UI as Chat UI (React)
