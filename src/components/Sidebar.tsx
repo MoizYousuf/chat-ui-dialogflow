@@ -93,7 +93,9 @@ export default function Sidebar() {
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-sm">
             💬
           </div>
-          <span className="text-sm font-semibold text-white">Dialogflow Chat</span>
+          <span className="text-sm font-semibold text-white">
+            Dialogflow Chat
+          </span>
         </div>
 
         {/* New chat button — primary action in the sidebar */}
@@ -132,7 +134,7 @@ export default function Sidebar() {
           <p className="text-xs text-white/25 text-center mt-6 px-4">
             No conversations yet.
             <br />
-            Click "New chat" to begin.
+            Click &quot;New chat&quot; to begin.
           </p>
         ) : (
           <motion.nav

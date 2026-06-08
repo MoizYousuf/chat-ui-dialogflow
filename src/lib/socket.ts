@@ -37,7 +37,7 @@ export function initSocketServer(httpServer: HttpServer): void {
     // Main message handler: relay user text to Dialogflow and push the reply back.
     socket.on(
       "message:send",
-      async ({ sessionId, text, timestamp }: MessageSendPayload) => {
+      async ({ sessionId, text }: MessageSendPayload) => {
         // Tell the frontend the bot is thinking right away, before we even
         // touch Dialogflow — this makes the typing indicator feel instant.
         socket.emit("bot:typing", { sessionId, isTyping: true });
