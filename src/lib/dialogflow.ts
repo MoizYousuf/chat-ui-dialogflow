@@ -1,13 +1,16 @@
 import { SessionsClient } from "@google-cloud/dialogflow";
+import * as path from "path";
+import * as fs from "fs";
 import type { DialogflowResult } from "../types";
 
 // One client for the whole server lifetime — creating a new one per request
 // would spin up fresh gRPC connections each time, which is slow and wasteful.
 let client: SessionsClient | null = null;
 
-// Resolve Google credentials from either a file path (local dev) or a
-// base64-encoded JSON string (production deployments like Railway/Render).
+// Resolve Google credentials to an explicit object so the SDK never has to
+// chase a relative file path (which breaks when cwd isn't the project root).
 function resolveCredentials(): object | undefined {
+  // Option 1: base64-encoded JSON — ideal for production / CI environments
   if (process.env.GOOGLE_CREDENTIALS_BASE64) {
     const json = Buffer.from(
       process.env.GOOGLE_CREDENTIALS_BASE64,
@@ -15,9 +18,30 @@ function resolveCredentials(): object | undefined {
     ).toString("utf-8");
     return JSON.parse(json);
   }
-  // If GOOGLE_APPLICATION_CREDENTIALS is set to a file path, the SDK
-  // picks it up automatically — return undefined to let it do that.
-  return undefined;
+
+  // Option 2: file path — convert relative paths to absolute so the SDK
+  // always finds the file regardless of where Node was invoked from.
+  if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+    const rawPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+    const absPath = path.isAbsolute(rawPath)
+      ? rawPath
+      : path.resolve(process.cwd(), rawPath);
+
+    if (!fs.existsSync(absPath)) {
+      throw new Error(
+        `Credentials file not found at resolved path: ${absPath}\n` +
+          `(GOOGLE_APPLICATION_CREDENTIALS=${rawPath})`
+      );
+    }
+
+    // Read and parse the file ourselves so the SDK receives an object,
+    // not a path — this sidesteps the relative-path resolution bug entirely.
+    return JSON.parse(fs.readFileSync(absPath, "utf-8"));
+  }
+
+  throw new Error(
+    "No Google credentials configured. Set GOOGLE_APPLICATION_CREDENTIALS or GOOGLE_CREDENTIALS_BASE64."
+  );
 }
 
 // Lazily initialize the client on first use rather than at module load time,
@@ -25,9 +49,7 @@ function resolveCredentials(): object | undefined {
 function getClient(): SessionsClient {
   if (!client) {
     const credentials = resolveCredentials();
-    client = credentials
-      ? new SessionsClient({ credentials })
-      : new SessionsClient();
+    client = new SessionsClient({ credentials });
   }
   return client;
 }
