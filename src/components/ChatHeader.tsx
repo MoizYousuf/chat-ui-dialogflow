@@ -1,14 +1,30 @@
 "use client";
 
+/**
+ * ChatHeader.tsx
+ *
+ * Top bar of the chat panel showing the bot identity and live connection state.
+ * The coloured dot reflects the real Socket.io status:
+ *   green (pulsing) = connected, grey = connecting, red = connection error.
+ * The "Clear chat" button erases messages for the active session without
+ * removing it from the sidebar history.
+ */
 import { motion } from "framer-motion";
 import { useChat } from "../hooks/useChat";
 
 export default function ChatHeader() {
-  const { activeSessionId, connected, clearSession } = useChat();
+  const { activeSessionId, connected, connectionError, clearSession } = useChat();
 
   // Clear the current session's messages without removing it from the sidebar
   function handleClear() {
     if (activeSessionId) clearSession(activeSessionId);
+  }
+
+  // Derive the status label so the user always knows what's happening
+  function statusLabel(): string {
+    if (connected) return "Online";
+    if (connectionError) return "Connection error";
+    return "Connecting…";
   }
 
   return (
@@ -24,14 +40,25 @@ export default function ChatHeader() {
             Dialogflow Assistant
           </h1>
           <div className="flex items-center gap-1.5 mt-0.5">
-            {/* Pulsing dot reflects real socket connection state */}
+            {/* Dot colour: green = connected, red = error, grey = connecting */}
             <motion.span
-              animate={{ opacity: connected ? [1, 0.4, 1] : 0.3 }}
+              animate={{
+                opacity: connected ? [1, 0.4, 1] : 1,
+              }}
               transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-              className={`w-1.5 h-1.5 rounded-full ${connected ? "bg-emerald-400" : "bg-white/30"}`}
+              className={`w-1.5 h-1.5 rounded-full ${
+                connected
+                  ? "bg-emerald-400"
+                  : connectionError
+                    ? "bg-red-400"
+                    : "bg-white/30"
+              }`}
             />
-            <span className="text-xs text-white/40">
-              {connected ? "Online" : "Connecting…"}
+            <span
+              className={`text-xs ${connectionError ? "text-red-400/70" : "text-white/40"}`}
+              title={connectionError ?? undefined}
+            >
+              {statusLabel()}
             </span>
           </div>
         </div>

@@ -1,5 +1,14 @@
 "use client";
 
+/**
+ * chatStore.ts — Global chat state (Zustand)
+ *
+ * Manages the full list of chat sessions and the active one. Uses Zustand's
+ * `persist` middleware to save sessions to localStorage so they survive page
+ * reloads. `skipHydration: true` defers the localStorage read until after the
+ * first client render, which keeps server-rendered and client HTML in sync and
+ * avoids React hydration warnings.
+ */
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { v4 as uuidv4 } from "uuid";
@@ -42,6 +51,7 @@ export const useChatStore = create<ChatStore>()(
         return id;
       },
 
+      // Switch the active session — the chat window re-renders with that session's messages.
       setActiveSession(id) {
         set({ activeSessionId: id });
       },
@@ -66,6 +76,7 @@ export const useChatStore = create<ChatStore>()(
         }));
       },
 
+      // Toggled by the socket's bot:typing event — drives the TypingIndicator component.
       setTyping(isTyping) {
         set({ isTyping });
       },
@@ -82,6 +93,7 @@ export const useChatStore = create<ChatStore>()(
         }));
       },
 
+      // Convenience getter used by useChat — avoids re-deriving in every component.
       getActiveSession() {
         const { sessions, activeSessionId } = get();
         return sessions.find((s) => s.id === activeSessionId);

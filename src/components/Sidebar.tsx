@@ -1,5 +1,14 @@
 "use client";
 
+/**
+ * Sidebar.tsx
+ *
+ * Left panel showing the list of chat sessions and the "New chat" button.
+ * Each session row displays a truncated title (derived from the first user
+ * message), a relative timestamp, and the message count. Clicking a row
+ * switches the active session in the store. Session items animate in with
+ * a staggered slide from the left using Framer Motion.
+ */
 import { motion, AnimatePresence } from "framer-motion";
 import { useChat } from "../hooks/useChat";
 import type { ChatSession } from "../types";

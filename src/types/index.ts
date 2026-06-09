@@ -1,3 +1,11 @@
+/**
+ * types/index.ts — Shared TypeScript types
+ *
+ * Single source of truth for all data shapes used across the client and server.
+ * Keeping them here avoids duplication and ensures that socket event payloads
+ * on the server match what the client components expect.
+ */
+
 // ── Core domain models ──────────────────────────────────────────────
 
 export interface Message {

@@ -1,5 +1,14 @@
 "use client";
 
+/**
+ * ChatWindow.tsx
+ *
+ * Scrollable message list for the active session. Auto-scrolls to the bottom
+ * whenever a new message lands or the typing indicator appears. Shows an
+ * empty-state prompt with hint chips when the session has no messages yet.
+ * AnimatePresence wraps the list so each bubble can play an exit animation
+ * when messages are cleared.
+ */
 import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useChat } from "../hooks/useChat";

@@ -1,5 +1,13 @@
 "use client";
 
+/**
+ * TypingIndicator.tsx
+ *
+ * Animated three-dot "bot is thinking" indicator shown while the server is
+ * waiting for a Dialogflow response. Each dot bounces on a staggered delay
+ * so the animation looks like a wave. Fades in/out via AnimatePresence in
+ * the parent ChatWindow.
+ */
 import { motion } from "framer-motion";
 
 // Three dots that bounce in sequence — the delay on each dot gives the

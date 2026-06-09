@@ -1,5 +1,15 @@
 "use client";
 
+/**
+ * MessageInput.tsx
+ *
+ * Text input bar at the bottom of the chat. The textarea auto-expands as the
+ * user types (up to ~8 lines) and resets after sending. Keyboard behaviour:
+ *   Enter       → send the message
+ *   Shift+Enter → insert a newline
+ * The send button is disabled while the bot is typing or the input is empty,
+ * preventing duplicate submissions. A neon purple glow animates on hover.
+ */
 import { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useChat } from "../hooks/useChat";

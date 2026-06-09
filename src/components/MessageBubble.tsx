@@ -1,5 +1,14 @@
 "use client";
 
+/**
+ * MessageBubble.tsx
+ *
+ * Renders a single chat message. Bot messages align left with a purple glass
+ * bubble; user messages align right with a blue/cyan glass bubble. Each bubble
+ * slides in from its respective side using a spring animation. The intent name
+ * is shown below bot messages (small, muted) so developers can verify which
+ * Dialogflow intent fired during testing.
+ */
 import { motion } from "framer-motion";
 import type { Message } from "../types";
 
