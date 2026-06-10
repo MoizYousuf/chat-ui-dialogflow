@@ -88,10 +88,6 @@ export default function MessageInput() {
           </svg>
         </motion.button>
       </div>
-
-      <p className="text-center text-xs text-white/20 mt-2">
-        Powered by Google Dialogflow ES
-      </p>
     </div>
   );
 }
