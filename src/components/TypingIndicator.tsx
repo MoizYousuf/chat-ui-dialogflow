@@ -1,17 +1,8 @@
 "use client";
 
-/**
- * TypingIndicator.tsx
- *
- * Animated three-dot "bot is thinking" indicator shown while the server is
- * waiting for a Dialogflow response. Each dot bounces on a staggered delay
- * so the animation looks like a wave. Fades in/out via AnimatePresence in
- * the parent ChatWindow.
- */
 import { motion } from "framer-motion";
 
-// Three dots that bounce in sequence — the delay on each dot gives the
-// wave effect that makes it feel alive rather than mechanical.
+// staggered delay on each dot gives the wave effect
 const DOT_VARIANTS = {
   animate: (i: number) => ({
     y: [0, -8, 0],
@@ -33,7 +24,6 @@ export default function TypingIndicator() {
       transition={{ duration: 0.2 }}
       className="flex items-start gap-3 mb-1"
     >
-      {/* Bot avatar — matches the avatar in MessageBubble */}
       <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 glass-panel text-sm">
         🤖
       </div>

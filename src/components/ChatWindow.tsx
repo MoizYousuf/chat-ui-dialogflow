@@ -1,14 +1,5 @@
 "use client";
 
-/**
- * ChatWindow.tsx
- *
- * Scrollable message list for the active session. Auto-scrolls to the bottom
- * whenever a new message lands or the typing indicator appears. Shows an
- * empty-state prompt with hint chips when the session has no messages yet.
- * AnimatePresence wraps the list so each bubble can play an exit animation
- * when messages are cleared.
- */
 import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useChat } from "../hooks/useChat";
@@ -19,9 +10,6 @@ export default function ChatWindow() {
   const { activeSession, isTyping } = useChat();
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to the bottom whenever a new message or the typing indicator appears.
-  // We use scrollHeight rather than scrollIntoView to avoid the janky jump that
-  // happens when the typing indicator and a new bubble overlap in the viewport.
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
@@ -37,7 +25,6 @@ export default function ChatWindow() {
       className="flex-1 overflow-y-auto px-4 py-6 space-y-0.5"
     >
       {isEmpty ? (
-        // Empty state shown for fresh sessions — fades in gently
         <motion.div
           key="empty"
           initial={{ opacity: 0, scale: 0.97 }}
@@ -57,7 +44,6 @@ export default function ChatWindow() {
             </p>
           </div>
 
-          {/* Hint chips so the user has something to tap right away */}
           <div className="flex flex-wrap gap-2 justify-center mt-2">
             {["Say hello", "What can you do?", "Help me"].map((hint) => (
               <span

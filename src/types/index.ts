@@ -1,13 +1,3 @@
-/**
- * types/index.ts — Shared TypeScript types
- *
- * Single source of truth for all data shapes used across the client and server.
- * Keeping them here avoids duplication and ensures that socket event payloads
- * on the server match what the client components expect.
- */
-
-// ── Core domain models ──────────────────────────────────────────────
-
 export interface Message {
   id: string;
   sessionId: string;
@@ -20,13 +10,11 @@ export interface Message {
 
 export interface ChatSession {
   id: string;
-  // Set from the first user message so the sidebar shows something meaningful
+  // first user message gets used as title
   title: string;
   createdAt: number;
   messages: Message[];
 }
-
-// ── Socket event payloads ───────────────────────────────────────────
 
 export interface MessageSendPayload {
   sessionId: string;
@@ -50,8 +38,6 @@ export interface BotTypingPayload {
 export interface SessionNewPayload {
   sessionId: string;
 }
-
-// ── Dialogflow result shape returned by detectIntent ────────────────
 
 export interface DialogflowResult {
   fulfillmentText: string;

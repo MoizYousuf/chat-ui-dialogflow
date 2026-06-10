@@ -6,12 +6,9 @@ import type {
   SessionNewPayload,
 } from "../types";
 
-// Keep one Socket.io instance for the whole process — re-creating it on
-// every hot reload in dev would cause "address already in use" errors.
+// single instance — prevents "address already in use" on hot reload
 let io: Server | null = null;
 
-// Attach Socket.io to the existing HTTP server and register all event handlers.
-// Calling this more than once is safe — the guard below prevents double-init.
 export function initSocketServer(httpServer: HttpServer): void {
   if (io) return;
 
@@ -28,18 +25,13 @@ export function initSocketServer(httpServer: HttpServer): void {
   io.on("connection", (socket) => {
     console.log(`[socket] client connected: ${socket.id}`);
 
-    // The client tells us when a new chat session starts so we can log it.
-    // Dialogflow doesn't need to be notified — each session ID is just a string.
     socket.on("session:new", ({ sessionId }: SessionNewPayload) => {
       console.log(`[socket] new session: ${sessionId}`);
     });
 
-    // Main message handler: relay user text to Dialogflow and push the reply back.
     socket.on(
       "message:send",
       async ({ sessionId, text }: MessageSendPayload) => {
-        // Tell the frontend the bot is thinking right away, before we even
-        // touch Dialogflow — this makes the typing indicator feel instant.
         socket.emit("bot:typing", { sessionId, isTyping: true });
 
         try {
@@ -55,7 +47,6 @@ export function initSocketServer(httpServer: HttpServer): void {
         } catch (err) {
           console.error("[socket] Dialogflow error:", err);
 
-          // Send a graceful fallback so the UI never shows an empty response
           socket.emit("message:receive", {
             sessionId,
             text: "Sorry, I ran into a problem. Please try again.",
@@ -64,8 +55,6 @@ export function initSocketServer(httpServer: HttpServer): void {
             timestamp: Date.now(),
           });
         } finally {
-          // Always clear the typing indicator — even when Dialogflow throws,
-          // we don't want a spinner stuck on screen forever.
           socket.emit("bot:typing", { sessionId, isTyping: false });
         }
       }
@@ -77,8 +66,6 @@ export function initSocketServer(httpServer: HttpServer): void {
   });
 }
 
-// Expose the io instance for any server-side code that needs to broadcast
-// outside of a socket event handler (e.g., a webhook triggering a push).
 export function getSocketServer(): Server | null {
   return io;
 }

@@ -1,19 +1,9 @@
 "use client";
 
-/**
- * Sidebar.tsx
- *
- * Left panel showing the list of chat sessions and the "New chat" button.
- * Each session row displays a truncated title (derived from the first user
- * message), a relative timestamp, and the message count. Clicking a row
- * switches the active session in the store. Session items animate in with
- * a staggered slide from the left using Framer Motion.
- */
 import { motion, AnimatePresence } from "framer-motion";
 import { useChat } from "../hooks/useChat";
 import type { ChatSession } from "../types";
 
-// ── Sidebar container variants ──────────────────────────────────────
 const LIST_VARIANTS = {
   animate: { transition: { staggerChildren: 0.06 } },
 };
@@ -28,14 +18,12 @@ const ITEM_VARIANTS = {
   exit: { opacity: 0, x: -12, transition: { duration: 0.15 } },
 };
 
-// ── Individual session row ──────────────────────────────────────────
 interface SessionItemProps {
   session: ChatSession;
   isActive: boolean;
   onClick: () => void;
 }
 
-// Relative time label — "just now", "5m ago", etc.
 function relativeTime(ts: number): string {
   const diff = Date.now() - ts;
   const mins = Math.floor(diff / 60_000);
@@ -59,9 +47,8 @@ function SessionItem({ session, isActive, onClick }: SessionItemProps) {
         }`}
     >
       <div className="flex items-start gap-2.5">
-        {/* Active accent bar */}
         <div
-          className={`w-0.5 rounded-full mt-1 shrink-0 self-stretch min-h-[14px]
+          className={`w-0.5 rounded-full mt-1 shrink-0 self-stretch min-h-3.5
             ${isActive ? "bg-neon-purple" : "bg-transparent group-hover:bg-white/20"}`}
         />
 
@@ -89,17 +76,15 @@ function SessionItem({ session, isActive, onClick }: SessionItemProps) {
   );
 }
 
-// ── Sidebar ─────────────────────────────────────────────────────────
 export default function Sidebar() {
   const { sessions, activeSessionId, startNewChat, setActiveSession } =
     useChat();
 
   return (
     <aside className="w-72 shrink-0 h-full glass-panel border-r border-white/8 flex flex-col">
-      {/* App brand */}
       <div className="px-5 pt-5 pb-4 border-b border-white/8">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-sm">
+          <div className="w-8 h-8 rounded-lg bg-linear-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-sm">
             💬
           </div>
           <span className="text-sm font-semibold text-white">
@@ -107,7 +92,6 @@ export default function Sidebar() {
           </span>
         </div>
 
-        {/* New chat button — primary action in the sidebar */}
         <motion.button
           whileHover={{
             scale: 1.02,
@@ -136,10 +120,8 @@ export default function Sidebar() {
         </motion.button>
       </div>
 
-      {/* Session list */}
       <div className="flex-1 overflow-y-auto px-2 py-3">
         {sessions.length === 0 ? (
-          // Only shown before the user has started any conversation
           <p className="text-xs text-white/25 text-center mt-6 px-4">
             No conversations yet.
             <br />
@@ -166,7 +148,6 @@ export default function Sidebar() {
         )}
       </div>
 
-      {/* Footer */}
       <div className="px-4 py-3 border-t border-white/8">
         <p className="text-xs text-white/20 text-center">
           Sessions persist across reloads

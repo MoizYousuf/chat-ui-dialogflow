@@ -1,15 +1,5 @@
 "use client";
 
-/**
- * MessageInput.tsx
- *
- * Text input bar at the bottom of the chat. The textarea auto-expands as the
- * user types (up to ~8 lines) and resets after sending. Keyboard behaviour:
- *   Enter       → send the message
- *   Shift+Enter → insert a newline
- * The send button is disabled while the bot is typing or the input is empty,
- * preventing duplicate submissions. A neon purple glow animates on hover.
- */
 import { useRef, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useChat } from "../hooks/useChat";
@@ -19,8 +9,7 @@ export default function MessageInput() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { sendMessage, isTyping, activeSessionId } = useChat();
 
-  // Auto-grow the textarea as the user types, capped at 8 lines.
-  // We reset to "auto" first so shrinking the text also shrinks the height.
+  // auto-grow the textarea as the user types, max 8 lines
   useEffect(() => {
     const el = textareaRef.current;
     if (!el) return;
@@ -28,8 +17,6 @@ export default function MessageInput() {
     el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
   }, [text]);
 
-  // Shift+Enter inserts a newline; plain Enter sends — this is what every
-  // modern chat app does, so users don't need to think about it.
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -41,7 +28,6 @@ export default function MessageInput() {
     if (!text.trim() || isTyping || !activeSessionId) return;
     sendMessage(text);
     setText("");
-    // Reset height after clearing the text
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
     }
@@ -69,7 +55,6 @@ export default function MessageInput() {
                      max-h-40 overflow-y-auto"
         />
 
-        {/* Send button — scales up with a purple glow on hover */}
         <motion.button
           whileHover={
             canSend
@@ -88,7 +73,6 @@ export default function MessageInput() {
                      transition-opacity"
           aria-label="Send message"
         >
-          {/* Arrow icon */}
           <svg
             className="w-4 h-4 text-white translate-x-px"
             fill="none"
@@ -105,7 +89,6 @@ export default function MessageInput() {
         </motion.button>
       </div>
 
-      {/* Subtle hint at the bottom */}
       <p className="text-center text-xs text-white/20 mt-2">
         Powered by Google Dialogflow ES
       </p>

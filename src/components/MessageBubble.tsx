@@ -1,14 +1,5 @@
 "use client";
 
-/**
- * MessageBubble.tsx
- *
- * Renders a single chat message. Bot messages align left with a purple glass
- * bubble; user messages align right with a blue/cyan glass bubble. Each bubble
- * slides in from its respective side using a spring animation. The intent name
- * is shown below bot messages (small, muted) so developers can verify which
- * Dialogflow intent fired during testing.
- */
 import { motion } from "framer-motion";
 import type { Message } from "../types";
 
@@ -16,7 +7,6 @@ interface Props {
   message: Message;
 }
 
-// Spring physics give the bubble a satisfying "land" rather than a linear slide.
 const BOT_VARIANTS = {
   initial: { opacity: 0, x: -28, y: 8 },
   animate: {
@@ -39,7 +29,6 @@ const USER_VARIANTS = {
   exit: { opacity: 0, x: 16, transition: { duration: 0.15 } },
 };
 
-// Format as HH:MM — people care about the time, not the date within a session
 function formatTime(timestamp: number): string {
   return new Date(timestamp).toLocaleTimeString([], {
     hour: "2-digit",
@@ -59,15 +48,13 @@ export default function MessageBubble({ message }: Props) {
       exit="exit"
       className={`flex items-end gap-2.5 mb-1 ${isBot ? "flex-row" : "flex-row-reverse"}`}
     >
-      {/* Avatar */}
       <div
         className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-sm
-          ${isBot ? "glass-panel" : "bg-gradient-to-br from-purple-500 to-cyan-500"}`}
+          ${isBot ? "glass-panel" : "bg-linear-to-br from-purple-500 to-cyan-500"}`}
       >
         {isBot ? "🤖" : "👤"}
       </div>
 
-      {/* Bubble + timestamp */}
       <div
         className={`flex flex-col gap-1 max-w-[72%] ${isBot ? "items-start" : "items-end"}`}
       >
@@ -81,7 +68,7 @@ export default function MessageBubble({ message }: Props) {
         <div className="flex items-center gap-2 px-1">
           <span className="text-xs text-white/30">{formatTime(message.timestamp)}</span>
 
-          {/* Show intent name only for bot messages — useful for debugging */}
+          {/* intent name shows up under bot messages — handy for debugging */}
           {isBot && message.intent && (
             <span className="text-xs text-neon-purple/50 font-mono">
               {message.intent}

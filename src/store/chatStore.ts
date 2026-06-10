@@ -1,14 +1,5 @@
 "use client";
 
-/**
- * chatStore.ts — Global chat state (Zustand)
- *
- * Manages the full list of chat sessions and the active one. Uses Zustand's
- * `persist` middleware to save sessions to localStorage so they survive page
- * reloads. `skipHydration: true` defers the localStorage read until after the
- * first client render, which keeps server-rendered and client HTML in sync and
- * avoids React hydration warnings.
- */
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import { v4 as uuidv4 } from "uuid";
@@ -34,8 +25,6 @@ export const useChatStore = create<ChatStore>()(
       activeSessionId: null,
       isTyping: false,
 
-      // Create a new blank session and immediately make it active.
-      // Returns the ID so callers can emit the socket event right away.
       createSession() {
         const id = uuidv4();
         const newSession: ChatSession = {
@@ -51,13 +40,10 @@ export const useChatStore = create<ChatStore>()(
         return id;
       },
 
-      // Switch the active session — the chat window re-renders with that session's messages.
       setActiveSession(id) {
         set({ activeSessionId: id });
       },
 
-      // Push a message into the right session. If it's the very first user
-      // message, use its text as the session title so the sidebar is readable.
       addMessage(sessionId, message) {
         set((state) => ({
           sessions: state.sessions.map((s) => {
@@ -76,13 +62,10 @@ export const useChatStore = create<ChatStore>()(
         }));
       },
 
-      // Toggled by the socket's bot:typing event — drives the TypingIndicator component.
       setTyping(isTyping) {
         set({ isTyping });
       },
 
-      // Clear messages but keep the session in the sidebar — the user might
-      // want to start fresh without losing the entry in their history list.
       clearSession(sessionId) {
         set((state) => ({
           sessions: state.sessions.map((s) =>
@@ -93,7 +76,6 @@ export const useChatStore = create<ChatStore>()(
         }));
       },
 
-      // Convenience getter used by useChat — avoids re-deriving in every component.
       getActiveSession() {
         const { sessions, activeSessionId } = get();
         return sessions.find((s) => s.id === activeSessionId);
@@ -110,11 +92,8 @@ export const useChatStore = create<ChatStore>()(
               removeItem: () => undefined,
             }
       ),
-      // Defer localStorage reads until the client mounts so SSR HTML matches
-      // the first client render (avoids React hydration mismatches).
+      // skip hydration to avoid SSR mismatch
       skipHydration: true,
-      // Only persist the sessions list — isTyping is transient and should
-      // always start as false when the page reloads.
       partialize: (state) => ({
         sessions: state.sessions,
         activeSessionId: state.activeSessionId,

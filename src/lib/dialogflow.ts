@@ -3,14 +3,11 @@ import * as path from "path";
 import * as fs from "fs";
 import type { DialogflowResult } from "../types";
 
-// One client for the whole server lifetime — creating a new one per request
-// would spin up fresh gRPC connections each time, which is slow and wasteful.
+// reuse one gRPC client for the whole server lifetime
 let client: SessionsClient | null = null;
 
-// Resolve Google credentials to an explicit object so the SDK never has to
-// chase a relative file path (which breaks when cwd isn't the project root).
 function resolveCredentials(): object | undefined {
-  // Option 1: base64-encoded JSON — ideal for production / CI environments
+  // base64 JSON — good for prod/CI
   if (process.env.GOOGLE_CREDENTIALS_BASE64) {
     const json = Buffer.from(
       process.env.GOOGLE_CREDENTIALS_BASE64,
@@ -19,8 +16,6 @@ function resolveCredentials(): object | undefined {
     return JSON.parse(json);
   }
 
-  // Option 2: file path — convert relative paths to absolute so the SDK
-  // always finds the file regardless of where Node was invoked from.
   if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
     const rawPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
     const absPath = path.isAbsolute(rawPath)
@@ -34,8 +29,6 @@ function resolveCredentials(): object | undefined {
       );
     }
 
-    // Read and parse the file ourselves so the SDK receives an object,
-    // not a path — this sidesteps the relative-path resolution bug entirely.
     return JSON.parse(fs.readFileSync(absPath, "utf-8"));
   }
 
@@ -44,8 +37,7 @@ function resolveCredentials(): object | undefined {
   );
 }
 
-// Lazily initialize the client on first use rather than at module load time,
-// so the server can start up even if credentials aren't configured yet.
+// lazy init so the server can boot without credentials configured yet
 function getClient(): SessionsClient {
   if (!client) {
     const credentials = resolveCredentials();
@@ -54,16 +46,11 @@ function getClient(): SessionsClient {
   return client;
 }
 
-// Build the Dialogflow session path — this ties each conversation thread to
-// a unique session ID so Dialogflow tracks context across messages.
 function buildSessionPath(sessionId: string): string {
   const projectId = process.env.DIALOGFLOW_PROJECT_ID!;
   return getClient().projectAgentSessionPath(projectId, sessionId);
 }
 
-// Send a user message to Dialogflow ES and return the bot's reply.
-// Returns a safe fallback if anything goes wrong so callers don't need to
-// handle errors themselves.
 export async function detectIntent(
   sessionId: string,
   text: string,
