@@ -23,7 +23,7 @@ interface SessionItemProps {
   isActive: boolean;
   onClick: () => void;
 }
-
+// getting time difference in a human readable format like "5m ago", "2h ago", "3d ago"
 function relativeTime(ts: number): string {
   const diff = Date.now() - ts;
   const mins = Math.floor(diff / 60_000);

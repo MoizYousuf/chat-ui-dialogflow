@@ -17,12 +17,16 @@ export default function MessageInput() {
     el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
   }, [text]);
 
+  // handle Enter key to send message, Shift+Enter for newline
+
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
   }
+
+  // send message if user clicks the send button or presses Enter, but only if there's text, not currently typing, and a session is active
 
   function handleSend() {
     if (!text.trim() || isTyping || !activeSessionId) return;

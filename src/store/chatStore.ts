@@ -25,6 +25,8 @@ export const useChatStore = create<ChatStore>()(
       activeSessionId: null,
       isTyping: false,
 
+      // creates a new chat session with a unique ID, sets it as active, and returns the ID
+
       createSession() {
         const id = uuidv4();
         const newSession: ChatSession = {
@@ -44,6 +46,8 @@ export const useChatStore = create<ChatStore>()(
         set({ activeSessionId: id });
       },
 
+      // adds a message to the specified session, updates the session title if it's the first user message
+
       addMessage(sessionId, message) {
         set((state) => ({
           sessions: state.sessions.map((s) => {
@@ -54,7 +58,7 @@ export const useChatStore = create<ChatStore>()(
               ...s,
               title: isFirstUserMsg
                 ? message.text.slice(0, 35) +
-                  (message.text.length > 35 ? "…" : "")
+                (message.text.length > 35 ? "…" : "")
                 : s.title,
               messages: [...s.messages, message],
             };
@@ -87,10 +91,10 @@ export const useChatStore = create<ChatStore>()(
         typeof window !== "undefined"
           ? localStorage
           : {
-              getItem: () => null,
-              setItem: () => undefined,
-              removeItem: () => undefined,
-            }
+            getItem: () => null,
+            setItem: () => undefined,
+            removeItem: () => undefined,
+          }
       ),
       // skip hydration to avoid SSR mismatch
       skipHydration: true,

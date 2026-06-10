@@ -15,6 +15,8 @@ app.prepare().then(() => {
     handle(req, res, parsedUrl);
   });
 
+  // initialize WebSocket server for real-time chat functionality
+
   initSocketServer(httpServer);
 
   httpServer.listen(port, () => {

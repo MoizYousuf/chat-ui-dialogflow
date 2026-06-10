@@ -10,6 +10,8 @@ export default function ChatWindow() {
   const { activeSession, isTyping } = useChat();
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // auto-scroll to bottom when a new message arrives or when typing indicator shows up
+
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;

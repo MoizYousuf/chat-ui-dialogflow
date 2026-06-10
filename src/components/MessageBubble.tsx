@@ -29,6 +29,8 @@ const USER_VARIANTS = {
   exit: { opacity: 0, x: 16, transition: { duration: 0.15 } },
 };
 
+// format timestamp to "hh:mm" format
+
 function formatTime(timestamp: number): string {
   return new Date(timestamp).toLocaleTimeString([], {
     hour: "2-digit",
@@ -66,7 +68,9 @@ export default function MessageBubble({ message }: Props) {
         </div>
 
         <div className="flex items-center gap-2 px-1">
-          <span className="text-xs text-white/30">{formatTime(message.timestamp)}</span>
+          <span className="text-xs text-white/30">
+            {formatTime(message.timestamp)}
+          </span>
 
           {/* intent name shows up under bot messages — handy for debugging */}
           {isBot && message.intent && (
